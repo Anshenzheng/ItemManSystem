@@ -1,0 +1,14 @@
+.modal {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+table th, table td {
+  white-space: nowrap;
+}
