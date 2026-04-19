@@ -51,12 +51,10 @@ export class OrdersComponent implements OnInit {
   applyDateFilter(): void {
     const startDate = this.filterForm.get('startDate')?.value;
     const endDate = this.filterForm.get('endDate')?.value;
-
     if (!startDate || !endDate) {
       this.filteredOrders = [...this.orders];
       return;
     }
-
     this.loading = true;
     this.orderService.getOrdersByDateRange(startDate, endDate).subscribe({
       next: (data) => {
@@ -89,7 +87,6 @@ export class OrdersComponent implements OnInit {
     if (!confirm(`确定要取消订单「${order.orderNo}」吗？取消后库存将恢复。`)) {
       return;
     }
-
     this.orderService.cancelOrder(order.id!).subscribe({
       next: () => {
         this.appService.success('订单已取消，库存已恢复');
