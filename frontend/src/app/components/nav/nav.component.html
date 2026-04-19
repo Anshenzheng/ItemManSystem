@@ -1,0 +1,20 @@
+<header class="navbar">
+  <div class="navbar-brand">
+    <span class="brand-icon">🏪</span>
+    <span class="brand-name">进销存管理系统</span>
+  </div>
+  <nav class="nav-menu">
+    <button
+      *ngFor="let item of navItems"
+      class="nav-item"
+      [class.active]="isActive(item.path)"
+      (click)="navigateTo(item.path)"
+    >
+      <span class="nav-icon">{{ item.icon }}</span>
+      <span class="nav-label">{{ item.label }}</span>
+      <span *ngIf="item.path === '/inventory' && notifications.lowStockCount > 0" class="nav-badge">
+        {{ notifications.lowStockCount }}
+      </span>
+    </button>
+  </nav>
+</header>

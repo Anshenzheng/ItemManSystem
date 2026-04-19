@@ -1,0 +1,169 @@
+<div class="container" style="padding: 24px;">
+  <div class="card">
+    <div class="card-header">
+      <h2>📝 订单历史</h2>
+      <button class="btn btn-sm btn-secondary" (click)="loadOrders()">🔄 刷新</button>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="filterForm" style="margin-bottom: 20px;">
+        <div class="d-flex" style="gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label>开始日期</label>
+            <input type="date" formControlName="startDate" />
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label>结束日期</label>
+            <input type="date" formControlName="endDate" />
+          </div>
+          <div class="d-flex" style="gap: 8px;">
+            <button type="button" class="btn btn-primary btn-sm" (click)="applyDateFilter()">
+              🔍 筛选
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" (click)="clearFilter()">
+              清除
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div *ngIf="loading" class="text-center" style="padding: 40px;">
+        加载中...
+      </div>
+
+      <div *ngIf="!loading && filteredOrders.length === 0" class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <div class="empty-state-text">暂无订单记录</div>
+      </div>
+
+      <div *ngIf="!loading && filteredOrders.length > 0" class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>订单编号</th>
+              <th>客户姓名</th>
+              <th>联系电话</th>
+              <th>订单金额</th>
+              <th>订单状态</th>
+              <th>下单时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of filteredOrders">
+              <td><strong>{{ order.orderNo }}</strong></td>
+              <td>{{ order.customerName || '-' }}</td>
+              <td>{{ order.customerPhone || '-' }}</td>
+              <td>
+                <span style="font-weight: 600; color: var(--primary-color);">
+                  ¥{{ order.totalAmount?.toFixed(2) || '0.00' }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="getStatusBadgeClass(order.status || '')">
+                  {{ getStatusLabel(order.status || '') }}
+                </span>
+              </td>
+              <td>{{ order.orderDate | date:'yyyy-MM-dd HH:mm' }}</td>
+              <td>
+                <div class="d-flex" style="gap: 8px;">
+                  <button class="btn btn-sm btn-secondary" (click)="viewDetail(order)">
+                    详情
+                  </button>
+                  <button
+                    *ngIf="order.status === 'COMPLETED'"
+                    class="btn btn-sm btn-danger"
+                    (click)="cancelOrder(order)"
+                  >
+                    取消
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" [class.active]="showDetail" (click)="closeDetail()">
+    <div class="modal" (click)="$event.stopPropagation()" style="max-width: 700px;">
+      <div class="modal-header">
+        <h3>订单详情</h3>
+        <button class="modal-close" (click)="closeDetail()">&times;</button>
+      </div>
+      <div class="modal-body" *ngIf="selectedOrder">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; padding: 16px; background: var(--bg-secondary); border-radius: var(--radius-sm);">
+          <div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">订单编号</div>
+            <div style="font-weight: 600;">{{ selectedOrder.orderNo }}</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">订单状态</div>
+            <span class="badge" [ngClass]="getStatusBadgeClass(selectedOrder.status || '')">
+              {{ getStatusLabel(selectedOrder.status || '') }}
+            </span>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">客户姓名</div>
+            <div>{{ selectedOrder.customerName || '-' }}</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">联系电话</div>
+            <div>{{ selectedOrder.customerPhone || '-' }}</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">下单时间</div>
+            <div>{{ selectedOrder.orderDate | date:'yyyy-MM-dd HH:mm' }}</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">订单金额</div>
+            <div style="font-size: 18px; font-weight: 700; color: var(--primary-color);">
+              ¥{{ selectedOrder.totalAmount?.toFixed(2) || '0.00' }}
+            </div>
+          </div>
+        </div>
+
+        <h4 style="margin-bottom: 12px; font-size: 14px; color: var(--text-secondary);">商品明细</h4>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>商品</th>
+                <th>单价</th>
+                <th>数量</th>
+                <th>小计</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of selectedOrder.orderItems">
+                <td>
+                  <div style="font-weight: 500;">{{ item.productName }}</div>
+                  <div style="font-size: 12px; color: var(--text-muted);">{{ item.productCode }}</div>
+                </td>
+                <td>¥{{ item.unitPrice?.toFixed(2) || '0.00' }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>¥{{ item.subtotal?.toFixed(2) || '0.00' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div *ngIf="selectedOrder.remark" style="margin-top: 16px;">
+          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">备注</div>
+          <div>{{ selectedOrder.remark }}</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          *ngIf="selectedOrder?.status === 'COMPLETED'"
+          type="button"
+          class="btn btn-danger"
+          (click)="cancelOrder(selectedOrder!)"
+        >
+          取消订单
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="closeDetail()">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>

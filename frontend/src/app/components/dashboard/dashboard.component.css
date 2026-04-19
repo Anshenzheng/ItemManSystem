@@ -1,0 +1,101 @@
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat-card.clickable {
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.stat-card.clickable:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-card.has-warning {
+  animation: borderPulse 2s infinite;
+}
+
+@keyframes borderPulse {
+  0%, 100% {
+    border-color: var(--border-color);
+  }
+  50% {
+    border-color: var(--warning-color);
+  }
+}
+
+.stat-value.low-stock {
+  color: var(--danger-color);
+}
+
+.stat-arrow {
+  font-size: 20px;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.stat-card.clickable:hover .stat-arrow {
+  opacity: 1;
+  color: var(--primary-color);
+}
+
+.low-stock-item,
+.recent-order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.low-stock-item:last-child,
+.recent-order-item:last-child {
+  border-bottom: none;
+}
+
+.item-info,
+.order-info {
+  flex: 1;
+}
+
+.item-name,
+.order-no {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.item-code,
+.order-date {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.order-amount {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

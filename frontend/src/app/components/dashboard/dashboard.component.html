@@ -1,0 +1,151 @@
+<div class="container" style="padding: 24px;">
+  <div *ngIf="loading" class="text-center" style="padding: 80px;">
+    加载中...
+  </div>
+
+  <div *ngIf="!loading">
+    <h1 style="font-size: 24px; margin-bottom: 24px; color: var(--text-primary);">
+      👋 欢迎使用进销存管理系统
+    </h1>
+
+    <div *ngIf="dashboardData" class="stats-grid">
+      <div class="stat-card clickable" (click)="navigateTo('/products')">
+        <div class="stat-icon primary">📦</div>
+        <div class="stat-content">
+          <div class="stat-value">{{ dashboardData.totalProducts }}</div>
+          <div class="stat-label">商品总数</div>
+        </div>
+        <div class="stat-arrow">→</div>
+      </div>
+
+      <div class="stat-card clickable" (click)="navigateTo('/orders')">
+        <div class="stat-icon success">📝</div>
+        <div class="stat-content">
+          <div class="stat-value">{{ dashboardData.todayOrders }}</div>
+          <div class="stat-label">今日订单</div>
+        </div>
+        <div class="stat-arrow">→</div>
+      </div>
+
+      <div class="stat-card clickable" (click)="navigateTo('/sales')">
+        <div class="stat-icon primary">💰</div>
+        <div class="stat-content">
+          <div class="stat-value">¥{{ dashboardData.todaySales.toFixed(2) }}</div>
+          <div class="stat-label">今日销售额</div>
+        </div>
+        <div class="stat-arrow">→</div>
+      </div>
+
+      <div class="stat-card clickable" [class.has-warning]="dashboardData.lowStockCount > 0" (click)="navigateTo('/inventory')">
+        <div class="stat-icon warning">
+          ⚠️
+        </div>
+        <div class="stat-content">
+          <div class="stat-value" [class.low-stock]="dashboardData.lowStockCount > 0">
+            {{ dashboardData.lowStockCount }}
+          </div>
+          <div class="stat-label">库存预警</div>
+        </div>
+        <div class="stat-arrow">→</div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px;">
+      <div class="card">
+        <div class="card-header">
+          <h2>⚠️ 库存预警</h2>
+          <button class="btn btn-sm btn-secondary" (click)="navigateTo('/inventory')">查看全部</button>
+        </div>
+        <div class="card-body">
+          <div *ngIf="lowStockProducts.length === 0" class="empty-state" style="padding: 40px;">
+            <div class="empty-state-icon">✅</div>
+            <div class="empty-state-text">所有商品库存充足</div>
+          </div>
+
+          <div *ngIf="lowStockProducts.length > 0" class="low-stock-list">
+            <div *ngFor="let product of lowStockProducts" class="low-stock-item">
+              <div class="item-info">
+                <div class="item-name">{{ product.name }}</div>
+                <div class="item-code">{{ product.productCode }}</div>
+              </div>
+              <div class="item-stock">
+                <span class="badge badge-danger">
+                  库存: {{ product.stock || 0 }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>📝 最近订单</h2>
+          <button class="btn btn-sm btn-secondary" (click)="navigateTo('/orders')">查看全部</button>
+        </div>
+        <div class="card-body">
+          <div *ngIf="recentOrders.length === 0" class="empty-state" style="padding: 40px;">
+            <div class="empty-state-icon">📭</div>
+            <div class="empty-state-text">暂无订单记录</div>
+          </div>
+
+          <div *ngIf="recentOrders.length > 0" class="recent-orders">
+            <div *ngFor="let order of recentOrders" class="recent-order-item">
+              <div class="order-info">
+                <div class="order-no">{{ order.orderNo }}</div>
+                <div class="order-date">
+                  {{ order.orderDate | date:'yyyy-MM-dd HH:mm' }}
+                </div>
+              </div>
+              <div class="order-amount">
+                ¥{{ order.totalAmount?.toFixed(2) || '0.00' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-actions" style="margin-top: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+      <div class="card clickable" (click)="navigateTo('/products')">
+        <div class="card-body" style="display: flex; align-items: center; gap: 16px; padding: 20px;">
+          <div style="font-size: 32px;">📦</div>
+          <div>
+            <div style="font-weight: 600; color: var(--text-primary);">商品管理</div>
+            <div style="font-size: 13px; color: var(--text-muted);">新增、编辑、删除商品</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card clickable" (click)="navigateTo('/sales')">
+        <div class="card-body" style="display: flex; align-items: center; gap: 16px; padding: 20px;">
+          <div style="font-size: 32px;">🛒</div>
+          <div>
+            <div style="font-weight: 600; color: var(--text-primary);">开单卖货</div>
+            <div style="font-size: 13px; color: var(--text-muted);">创建销售订单</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card clickable" (click)="navigateTo('/inventory')">
+        <div class="card-body" style="display: flex; align-items: center; gap: 16px; padding: 20px;">
+          <div style="font-size: 32px;">📋</div>
+          <div>
+            <div style="font-weight: 600; color: var(--text-primary);">库存管理</div>
+            <div style="font-size: 13px; color: var(--text-muted);">查看库存和预警</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card clickable" (click)="navigateTo('/orders')">
+        <div class="card-body" style="display: flex; align-items: center; gap: 16px; padding: 20px;">
+          <div style="font-size: 32px;">📝</div>
+          <div>
+            <div style="font-weight: 600; color: var(--text-primary);">订单历史</div>
+            <div style="font-size: 13px; color: var(--text-muted);">查看历史订单记录</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

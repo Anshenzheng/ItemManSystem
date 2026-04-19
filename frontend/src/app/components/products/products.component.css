@@ -1,0 +1,31 @@
+.modal {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+table th, table td {
+  white-space: nowrap;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+}

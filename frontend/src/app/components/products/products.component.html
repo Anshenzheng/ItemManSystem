@@ -1,0 +1,140 @@
+<div class="container" style="padding: 24px;">
+  <div class="card">
+    <div class="card-header">
+      <h2>📦 商品管理</h2>
+      <button class="btn btn-primary" (click)="openAddModal()">
+        ➕ 新增商品
+      </button>
+    </div>
+    <div class="card-body">
+      <div class="form-group" style="max-width: 400px; margin-bottom: 20px;">
+        <div class="search-box">
+          <input
+            type="text"
+            placeholder="搜索商品名称、编码或分类..."
+            [(ngModel)]="searchKeyword"
+            (input)="searchProducts()"
+          />
+        </div>
+      </div>
+
+      <div *ngIf="loading" class="text-center" style="padding: 40px;">
+        加载中...
+      </div>
+
+      <div *ngIf="!loading && filteredProducts.length === 0" class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <div class="empty-state-text">
+          {{ searchKeyword ? '没有找到匹配的商品' : '暂无商品数据，点击「新增商品」开始添加' }}
+        </div>
+      </div>
+
+      <div *ngIf="!loading && filteredProducts.length > 0" class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>商品编码</th>
+              <th>商品名称</th>
+              <th>分类</th>
+              <th>单位</th>
+              <th>进价</th>
+              <th>售价</th>
+              <th>库存</th>
+              <th>低库存阈值</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of filteredProducts">
+              <td><strong>{{ product.productCode }}</strong></td>
+              <td>{{ product.name }}</td>
+              <td>{{ product.category || '-' }}</td>
+              <td>{{ product.unit || '个' }}</td>
+              <td>¥{{ product.purchasePrice?.toFixed(2) || '0.00' }}</td>
+              <td>¥{{ product.sellingPrice?.toFixed(2) || '0.00' }}</td>
+              <td>
+                <span class="badge" [ngClass]="getStockBadgeClass(product)">
+                  {{ product.stock || 0 }}
+                </span>
+              </td>
+              <td>{{ product.lowStockThreshold || 10 }}</td>
+              <td>
+                <div class="d-flex" style="gap: 8px;">
+                  <button class="btn btn-sm btn-secondary" (click)="openEditModal(product)">
+                    编辑
+                  </button>
+                  <button class="btn btn-sm btn-danger" (click)="deleteProduct(product)">
+                    删除
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" [class.active]="showModal" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3>{{ editingProduct ? '编辑商品' : '新增商品' }}</h3>
+        <button class="modal-close" (click)="closeModal()">&times;</button>
+      </div>
+      <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>商品编码 *</label>
+              <input type="text" formControlName="productCode" placeholder="请输入商品编码" />
+            </div>
+            <div class="form-group">
+              <label>商品名称 *</label>
+              <input type="text" formControlName="name" placeholder="请输入商品名称" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>分类</label>
+              <input type="text" formControlName="category" placeholder="如：办公用品、食品等" />
+            </div>
+            <div class="form-group">
+              <label>单位</label>
+              <input type="text" formControlName="unit" placeholder="如：个、件、kg、台等" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>进货单价</label>
+              <input type="number" formControlName="purchasePrice" min="0" step="0.01" placeholder="0.00" />
+            </div>
+            <div class="form-group">
+              <label>销售单价</label>
+              <input type="number" formControlName="sellingPrice" min="0" step="0.01" placeholder="0.00" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>库存数量</label>
+              <input type="number" formControlName="stock" min="0" placeholder="0" />
+            </div>
+            <div class="form-group">
+              <label>低库存提醒阈值</label>
+              <input type="number" formControlName="lowStockThreshold" min="0" placeholder="10" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>商品描述</label>
+            <textarea formControlName="description" rows="2" placeholder="可选，输入商品描述信息"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">取消</button>
+          <button type="submit" class="btn btn-primary" [disabled]="productForm.invalid">
+            {{ editingProduct ? '保存修改' : '创建商品' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
