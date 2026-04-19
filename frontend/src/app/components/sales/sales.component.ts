@@ -65,7 +65,6 @@ export class SalesComponent implements OnInit {
       this.filteredProducts = [...this.products];
       return;
     }
-
     const keyword = this.searchKeyword.toLowerCase();
     this.filteredProducts = this.products.filter(
       p => p.name.toLowerCase().includes(keyword) ||
@@ -83,7 +82,6 @@ export class SalesComponent implements OnInit {
 
   addToCart(product: Product): void {
     const existingItem = this.cartItems.find(item => item.product.id === product.id);
-
     if (existingItem) {
       if (existingItem.quantity >= (product.stock || 0)) {
         this.appService.warning(`库存不足，当前库存：${product.stock}`);
@@ -99,7 +97,6 @@ export class SalesComponent implements OnInit {
         subtotal: product.sellingPrice || 0
       });
     }
-
     this.searchKeyword = '';
     this.filteredProducts = [...this.products];
   }
@@ -110,7 +107,6 @@ export class SalesComponent implements OnInit {
 
   updateQuantity(item: CartItem, change: number): void {
     const newQuantity = item.quantity + change;
-
     if (newQuantity <= 0) {
       const index = this.cartItems.indexOf(item);
       if (index > -1) {
@@ -118,19 +114,16 @@ export class SalesComponent implements OnInit {
       }
       return;
     }
-
     if (newQuantity > (item.product.stock || 0)) {
       this.appService.warning(`库存不足，当前库存：${item.product.stock}`);
       return;
     }
-
     item.quantity = newQuantity;
     item.subtotal = item.unitPrice * item.quantity;
   }
 
   setQuantity(item: CartItem, event: any): void {
     const value = parseInt(event.target.value, 10);
-
     if (isNaN(value) || value <= 0) {
       item.quantity = 1;
     } else if (value > (item.product.stock || 0)) {
@@ -139,7 +132,6 @@ export class SalesComponent implements OnInit {
     } else {
       item.quantity = value;
     }
-
     item.subtotal = item.unitPrice * item.quantity;
   }
 
@@ -155,7 +147,6 @@ export class SalesComponent implements OnInit {
     if (this.cartItems.length === 0) {
       return;
     }
-
     if (confirm('确定要清空购物车吗？')) {
       this.cartItems = [];
     }
@@ -166,9 +157,7 @@ export class SalesComponent implements OnInit {
       this.appService.warning('请先添加商品到购物车');
       return;
     }
-
     this.submitting = true;
-
     const orderItems: OrderItem[] = this.cartItems.map(item => ({
       product: { id: item.product.id } as Product,
       productCode: item.product.productCode,
@@ -177,12 +166,10 @@ export class SalesComponent implements OnInit {
       unitPrice: item.unitPrice,
       subtotal: item.subtotal
     }));
-
     const order: Order = {
       ...this.orderForm.value,
       orderItems
     };
-
     this.orderService.createOrder(order).subscribe({
       next: (createdOrder) => {
         this.appService.success(`订单创建成功！订单号：${createdOrder.orderNo}`);

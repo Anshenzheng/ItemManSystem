@@ -60,7 +60,6 @@ export class ProductsComponent implements OnInit {
       this.filteredProducts = [...this.products];
       return;
     }
-
     const keyword = this.searchKeyword.toLowerCase();
     this.filteredProducts = this.products.filter(
       p => p.name.toLowerCase().includes(keyword) ||
@@ -106,9 +105,7 @@ export class ProductsComponent implements OnInit {
     if (this.productForm.invalid) {
       return;
     }
-
     const productData: Product = this.productForm.value;
-
     if (this.editingProduct) {
       this.productService.updateProduct(this.editingProduct.id!, productData).subscribe({
         next: () => {
@@ -138,7 +135,6 @@ export class ProductsComponent implements OnInit {
     if (!confirm(`确定要删除商品「${product.name}」吗？`)) {
       return;
     }
-
     this.productService.deleteProduct(product.id!).subscribe({
       next: () => {
         this.appService.success('商品删除成功');

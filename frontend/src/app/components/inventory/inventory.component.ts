@@ -76,11 +76,9 @@ export class InventoryComponent implements OnInit {
 
   applyFilters(): void {
     let result = [...this.products];
-
     if (this.showOnlyLowStock) {
       result = result.filter(p => this.isLowStock(p));
     }
-
     if (this.searchKeyword.trim()) {
       const keyword = this.searchKeyword.toLowerCase();
       result = result.filter(
@@ -89,7 +87,6 @@ export class InventoryComponent implements OnInit {
              (p.category && p.category.toLowerCase().includes(keyword))
       );
     }
-
     this.filteredProducts = result;
   }
 
@@ -100,7 +97,6 @@ export class InventoryComponent implements OnInit {
   getStockStatus(product: Product): { label: string; class: string } {
     const stock = product.stock || 0;
     const threshold = product.lowStockThreshold || 10;
-
     if (stock <= 0) {
       return { label: '缺货', class: 'badge-danger' };
     } else if (stock <= threshold) {
