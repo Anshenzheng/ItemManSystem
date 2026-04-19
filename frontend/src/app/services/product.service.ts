@@ -24,8 +24,10 @@ export class ProductService {
   }
 
   searchProducts(keyword?: string): Observable<Product[]> {
-    const params = keyword ? { keyword } : {};
-    return this.http.get<Product[]>(`${this.apiUrl}/search`, { params });
+    if (keyword) {
+      return this.http.get<Product[]>(`${this.apiUrl}/search`, { params: { keyword } });
+    }
+    return this.http.get<Product[]>(`${this.apiUrl}/search`);
   }
 
   getLowStockProducts(): Observable<Product[]> {
