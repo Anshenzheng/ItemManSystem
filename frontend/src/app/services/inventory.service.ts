@@ -29,8 +29,10 @@ export class InventoryService {
   }
 
   searchInventory(keyword?: string): Observable<Product[]> {
-    const params = keyword ? { keyword } : {};
-    return this.http.get<Product[]>(`${this.apiUrl}/search`, { params });
+    if (keyword) {
+      return this.http.get<Product[]>(`${this.apiUrl}/search`, { params: { keyword } });
+    }
+    return this.http.get<Product[]>(`${this.apiUrl}/search`);
   }
 
   getInventorySummary(): Observable<InventorySummary> {
